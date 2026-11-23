@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Álbum – Pulga</title>
+  <link rel="icon" href="assets/logo-pulga.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;700;800&family=Oswald:wght@500;600;700&display=swap">
+  <link rel="stylesheet" href="css/estilo.css">
+</head>
+<body>
+  <header id="topo"></header>
+  <main class="container">
+    <div class="faixa">
+      <h1>Álbum</h1>
+      <p>Fotos e vídeos das ações, eventos e projetos.</p>
+    </div>
+    <section style="margin-top:18px">
+      <div id="lista-albuns" class="grade-albuns"></div>
+    </section>
+  </main>
+  <footer id="rodape"></footer>
+
+  <script src="vendor/supabase.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/albuns.js"></script>
+  <script>ALBUNS.desenharLista(document.getElementById("lista-albuns"));</script>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pulga – Sempre ao lado da comunidade</title>
+  <meta name="description" content="Agenda, projetos e ações do Pulga. Sempre ao lado da comunidade.">
+  <meta property="og:title" content="Pulga – Sempre ao lado da comunidade">
+  <meta property="og:description" content="Agenda, projetos e ações do Pulga.">
+  <meta property="og:image" content="assets/arte-oficial.jpg">
+  <link rel="icon" href="assets/logo-pulga.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;700;800&family=Oswald:wght@500;600;700&display=swap">
+  <link rel="stylesheet" href="css/estilo.css">
+</head>
+<body>
+  <header id="topo"></header>
+
+  <main class="container">
+    <div class="capa">
+      <img src="assets/cartaz-pulga.jpg" alt="Pulga – Sempre ao lado da comunidade. Juntos por uma cidade ainda melhor!">
+    </div>
+
+    <div id="aviso-demo" class="aviso-teste" hidden>
+      <strong>⚠️ VERSÃO DE TESTE: ainda não está ligada ao banco de dados</strong>
+      Os eventos marcados como "(exemplo)" são só para mostrar como o site fica.
+    </div>
+
+    <section id="secao-agora" hidden>
+      <div class="titulo-secao"><span class="pulso"></span><h2>Acontecendo agora</h2></div>
+      <div id="lista-agora" class="grade"></div>
+    </section>
+
+    <section id="agenda">
+      <div class="titulo-secao"><h2>Próximas ações</h2></div>
+      <div id="lista-proximas" class="grade"></div>
+    </section>
+
+    <section>
+      <div class="titulo-secao"><h2>Projetos apoiados</h2><a class="ver-mais" href="projetos.html">Ver todos →</a></div>
+      <div id="lista-projetos" class="grade-albuns"></div>
+    </section>
+
+    <section>
+      <div class="titulo-secao"><h2>Álbum</h2><a class="ver-mais" href="albuns.html">Ver todos →</a></div>
+      <div id="lista-albuns" class="grade-albuns"></div>
+    </section>
+
+    <section>
+      <div class="titulo-secao"><h2>Ações realizadas</h2></div>
+      <div id="lista-passadas" class="grade"></div>
+    </section>
+
+    <section>
+      <div class="titulo-secao"><h2>Calendário</h2></div>
+      <div id="calendario"></div>
+    </section>
+  </main>
+
+  <footer id="rodape"></footer>
+
+  <dialog id="detalhes">
+    <div class="dialog-corpo">
+      <span id="d-etiqueta" class="etiqueta"></span>
+      <h2 id="d-titulo"></h2>
+      <p><strong>Quando:</strong> <span id="d-quando"></span></p>
+      <p id="d-local-linha"><strong>Onde:</strong> <span id="d-local"></span></p>
+      <p id="d-descricao"></p>
+      <div class="acoes">
+        <a id="d-album" class="botao" href="#" hidden>📌 Ver o projeto</a>
+        <button class="botao secundario" onclick="document.getElementById('detalhes').close()">Fechar</button>
+      </div>
+    </div>
+  </dialog>
+
+  <script src="vendor/fullcalendar.min.js"></script>
+  <script src="vendor/fullcalendar-pt-br.min.js"></script>
+  <script src="vendor/supabase.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/albuns.js"></script>
+  <script src="js/publico.js"></script>
+</body>
+</html>

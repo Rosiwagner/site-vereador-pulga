@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Administrador – Pulga</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="assets/logo-pulga.png">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;700;800&family=Oswald:wght@500;600;700&display=swap">
+  <link rel="stylesheet" href="css/estilo.css">
+</head>
+<body>
+  <header id="topo"></header>
+
+  <main class="container">
+    <div class="faixa" style="display:flex;justify-content:space-between;align-items:end;gap:12px;flex-wrap:wrap">
+      <div><h1>Administrador</h1><p id="usuario-logado">Acesso restrito aos administradores do site</p></div>
+      <button id="btn-sair" class="botao secundario pequeno" hidden>Sair</button>
+    </div>
+    <div id="aviso-demo" class="aviso-teste" hidden>
+      <strong>⚠️ VERSÃO DE TESTE: ainda não está ligada ao banco de dados</strong>
+      Esta cópia serve só para você ver como o site funciona. Nada do que você cadastrar aqui vai para a internet, e as senhas não são conferidas.
+      O site de verdade passa a funcionar depois que o Supabase for ligado (estamos fazendo isso juntos).
+    </div>
+
+    <!-- LOGIN -->
+    <div id="tela-login" class="cartao login" hidden>
+      <h2>🔒 Entrar como administrador</h2>
+      <form id="form-login">
+        <div class="campo"><label for="l-email">Usuário (seu e-mail)</label><input id="l-email" type="email" required autocomplete="username"></div>
+        <div class="campo"><label for="l-senha">Senha</label><input id="l-senha" type="password" minlength="6" required autocomplete="current-password"></div>
+        <p class="dica" style="margin-top:-6px">Primeira vez? Digite seu e-mail e a senha que você quer usar. A senha é criada nesse momento (mínimo 6 caracteres).</p>
+        <p id="erro-login" class="erro"></p>
+        <button class="botao" type="submit">Entrar</button>
+      </form>
+    </div>
+
+    <!-- PAINEL -->
+    <div id="tela-painel" hidden>
+      <nav class="abas">
+        <button class="aba ativa" data-aba="eventos">📅 Agenda</button>
+        <button class="aba" data-aba="projetos">📌 Projetos</button>
+        <button class="aba" data-aba="albuns">📷 Álbuns e fotos</button>
+        <button class="aba" data-aba="colaboradores">👥 Equipe</button>
+        <button class="aba" data-aba="participantes">Participantes</button>
+        <button class="aba" data-aba="admins" hidden>Administradores</button>
+        <button class="aba" data-aba="log" hidden>Registro de atividades</button>
+      </nav>
+
+      <!-- EVENTOS -->
+      <div id="painel-eventos" class="painel ativo">
+        <div class="duas-colunas">
+          <form id="form-evento" class="cartao">
+            <h2 id="titulo-form-evento">Novo evento na agenda</h2>
+            <input type="hidden" id="e-id">
+            <div class="campo"><label for="e-titulo">Título *</label><input id="e-titulo" required></div>
+            <div class="campo"><label for="e-inicio">Início *</label><input id="e-inicio" type="datetime-local" required></div>
+            <div class="campo"><label for="e-fim">Fim</label><input id="e-fim" type="datetime-local"></div>
+            <div class="linha">
+              <div class="campo"><label for="e-local">Local</label><input id="e-local"></div>
+              <div class="campo"><label for="e-categoria">Tipo</label>
+                <select id="e-categoria">
+                  <option>Ação</option><option>Visita</option><option>Reunião</option>
+                  <option>Sessão</option><option>Audiência</option><option>Evento</option><option>Apoio a projeto</option>
+                </select>
+              </div>
+            </div>
+            <div class="campo"><label for="e-projeto">Faz parte de qual projeto?</label>
+              <select id="e-projeto"><option value="">Nenhum</option></select>
+              <div class="dica">Opcional. O evento aparece também na página do projeto.</div>
+            </div>
+            <div class="campo"><label for="e-descricao">Descrição</label><textarea id="e-descricao"></textarea></div>
+            <div class="campo"><label>Colaboradores responsáveis</label><div id="e-colaboradores" class="lista-marcar"></div></div>
+            <div class="campo"><label>Participantes</label><div id="e-participantes" class="lista-marcar"></div></div>
+            <div class="campo"><label class="checkbox"><input id="e-publicado" type="checkbox" checked> Mostrar no site público</label></div>
+            <p id="erro-evento" class="erro"></p>
+            <div class="acoes">
+              <button class="botao" type="submit">Salvar evento</button>
+              <button class="botao secundario" type="button" id="btn-limpar-evento">Limpar</button>
+            </div>
+          </form>
+
+          <div class="cartao">
+            <h2>Eventos cadastrados</h2>
+            <div class="tabela-wrap">
+              <table>
+                <thead><tr><th>Quando</th><th>Evento</th><th>Equipe / Público</th><th></th></tr></thead>
+                <tbody id="tabela-eventos"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROJETOS -->
+      <div id="painel-projetos" class="painel">
+        <div class="duas-colunas">
+          <form id="form-projeto" class="cartao">
+            <h2 id="titulo-form-projeto">Novo projeto</h2>
+            <input type="hidden" id="p-id">
+            <input type="hidden" id="p-capa-url">
+            <div class="campo"><label for="p-titulo">Nome do projeto *</label><input id="p-titulo" required placeholder="Ex.: Novos Bambas 2026"></div>
+            <div class="campo"><label for="p-data">Data</label><input id="p-data" type="date"></div>
+            <div class="campo"><label for="p-descricao">Sobre o projeto</label><textarea id="p-descricao" placeholder="Conte o que é o projeto e como o Pulga apoia."></textarea></div>
+            <div class="campo">
+              <label for="p-capa">Foto de capa</label>
+              <img id="p-capa-previa" class="miniatura" alt="" hidden style="width:96px;height:120px;margin-bottom:6px">
+              <input id="p-capa" type="file" accept="image/*">
+            </div>
+            <div class="campo"><label class="checkbox"><input id="p-publicado" type="checkbox" checked> Mostrar no site</label></div>
+            <p id="erro-projeto" class="erro"></p>
+            <div class="acoes">
+              <button class="botao" type="submit">Salvar projeto</button>
+              <button class="botao secundario" type="button" id="btn-limpar-projeto">Limpar</button>
+            </div>
+          </form>
+          <div class="cartao">
+            <h2>Projetos cadastrados</h2>
+            <div class="tabela-wrap"><table>
+              <thead><tr><th></th><th>Projeto</th><th></th></tr></thead>
+              <tbody id="tabela-projetos"></tbody>
+            </table></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ÁLBUNS -->
+      <div id="painel-albuns" class="painel">
+        <div class="duas-colunas">
+          <form id="form-album" class="cartao">
+            <h2 id="titulo-form-album">Novo álbum</h2>
+            <input type="hidden" id="al-id">
+            <input type="hidden" id="al-capa-url">
+            <div class="campo"><label for="al-titulo">Nome do álbum *</label><input id="al-titulo" required placeholder="Ex.: Mutirão no bairro Centro"></div>
+            <div class="campo"><label for="al-data">Data</label><input id="al-data" type="date"></div>
+            <div class="campo"><label for="al-projeto">É de algum projeto?</label>
+              <select id="al-projeto"><option value="">Não, é um álbum avulso</option></select>
+            </div>
+            <div class="campo"><label for="al-descricao">Descrição</label><textarea id="al-descricao"></textarea></div>
+            <div class="campo">
+              <label for="al-capa">Foto de capa</label>
+              <img id="al-capa-previa" class="miniatura" alt="" hidden style="width:96px;height:120px;margin-bottom:6px">
+              <input id="al-capa" type="file" accept="image/*">
+              <div class="dica">Se não escolher, a primeira foto enviada vira a capa.</div>
+            </div>
+            <div class="campo"><label class="checkbox"><input id="al-publicado" type="checkbox" checked> Mostrar no site</label></div>
+            <p id="erro-album" class="erro"></p>
+            <div class="acoes">
+              <button class="botao" type="submit">Salvar álbum</button>
+              <button class="botao secundario" type="button" id="btn-limpar-album">Limpar</button>
+            </div>
+          </form>
+
+          <div>
+            <div class="cartao">
+              <h2>Álbuns cadastrados</h2>
+              <div class="tabela-wrap"><table>
+                <thead><tr><th></th><th>Álbum</th><th>Fotos/vídeos</th><th></th></tr></thead>
+                <tbody id="tabela-albuns"></tbody>
+              </table></div>
+            </div>
+
+            <div id="gerenciar-midias" class="cartao gerenciar-midias" hidden>
+              <h2>Fotos e vídeos: <span id="m-album-nome"></span></h2>
+              <div class="linha">
+                <div class="campo">
+                  <label for="m-arquivos">Enviar fotos ou vídeos do computador/celular</label>
+                  <input id="m-arquivos" type="file" accept="image/*,video/*" multiple>
+                  <div class="dica">Pode escolher várias de uma vez. Fotos são reduzidas automaticamente. Vídeos até 50 MB.</div>
+                </div>
+                <form id="form-video" class="campo">
+                  <label for="m-link">Ou colar link de vídeo (YouTube)</label>
+                  <input id="m-link" type="url" placeholder="https://youtube.com/watch?v=...">
+                  <div class="acoes"><button class="botao azul pequeno" type="submit">Adicionar vídeo</button></div>
+                </form>
+              </div>
+              <div class="campo"><label for="m-legenda">Legenda (opcional, vale para os próximos envios)</label><input id="m-legenda"></div>
+              <p id="erro-midia" class="erro"></p>
+              <div id="galeria-admin" class="galeria-admin"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- COLABORADORES -->
+      <div id="painel-colaboradores" class="painel">
+        <div class="duas-colunas">
+          <form id="form-colaboradores" class="cartao" data-tabela="colaboradores">
+            <h2 id="titulo-form-equipe">Novo membro da equipe</h2>
+            <input type="hidden" name="id">
+            <input type="hidden" name="foto_url">
+            <input type="hidden" name="foto_caminho">
+            <div class="campo"><label>Nome *</label><input name="nome" required></div>
+            <div class="campo"><label>Função</label><input name="funcao" placeholder="Ex.: assessor, voluntário, coordenador"></div>
+            <div class="campo">
+              <label for="col-foto">Foto</label>
+              <div style="display:flex;align-items:center;gap:12px">
+                <img id="col-foto-previa" class="foto-equipe-previa" alt="" hidden>
+                <button type="button" id="btn-remover-foto" class="botao perigo pequeno" hidden>Remover foto</button>
+              </div>
+              <input id="col-foto" type="file" accept="image/*">
+              <div class="dica">Para trocar a foto, é só escolher outra e salvar.</div>
+            </div>
+            <div class="linha">
+              <div class="campo"><label>Telefone</label><input name="telefone" type="tel"></div>
+              <div class="campo"><label>E-mail</label><input name="email" type="email"></div>
+            </div>
+            <div class="dica" style="margin:-6px 0 12px">Telefone e e-mail nunca aparecem no site público.</div>
+            <div class="linha">
+              <div class="campo"><label class="checkbox"><input name="mostrar_no_site" type="checkbox" checked> Mostrar na página "Equipe"</label></div>
+              <div class="campo"><label>Ordem na página</label><input name="ordem" type="number" value="0"></div>
+            </div>
+            <p class="erro"></p>
+            <div class="acoes">
+              <button class="botao" type="submit">Salvar</button>
+              <button class="botao secundario" type="reset">Limpar</button>
+            </div>
+          </form>
+          <div class="cartao">
+            <h2>Equipe cadastrada</h2>
+            <div class="tabela-wrap"><table>
+              <thead><tr><th>Nome</th><th>Função</th><th>Contato</th><th></th></tr></thead>
+              <tbody id="tabela-colaboradores"></tbody>
+            </table></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PARTICIPANTES -->
+      <div id="painel-participantes" class="painel">
+        <div class="duas-colunas">
+          <form id="form-participantes" class="cartao" data-tabela="participantes">
+            <h2>Participante</h2>
+            <input type="hidden" name="id">
+            <div class="campo"><label>Nome *</label><input name="nome" required></div>
+            <div class="campo"><label>Bairro</label><input name="bairro"></div>
+            <div class="linha">
+              <div class="campo"><label>Telefone</label><input name="telefone" type="tel"></div>
+              <div class="campo"><label>E-mail</label><input name="email" type="email"></div>
+            </div>
+            <p class="erro"></p>
+            <div class="acoes">
+              <button class="botao" type="submit">Salvar</button>
+              <button class="botao secundario" type="reset">Limpar</button>
+            </div>
+          </form>
+          <div class="cartao">
+            <h2>Participantes cadastrados</h2>
+            <div class="tabela-wrap"><table>
+              <thead><tr><th>Nome</th><th>Bairro</th><th>Contato</th><th></th></tr></thead>
+              <tbody id="tabela-participantes"></tbody>
+            </table></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ADMINISTRADORES -->
+      <div id="painel-admins" class="painel">
+        <div class="duas-colunas">
+          <form id="form-admin" class="cartao">
+            <h2>Novo administrador</h2>
+            <p class="dica" style="margin-top:0">Administradores podem cadastrar eventos, álbuns, fotos, vídeos, equipe e participantes. Só você, como administrador geral, pode autorizar ou remover administradores.</p>
+            <div class="campo"><label for="a-nome">Nome</label><input id="a-nome"></div>
+            <div class="campo"><label for="a-email">E-mail *</label><input id="a-email" type="email" required></div>
+            <p id="erro-admin" class="erro"></p>
+            <button class="botao" type="submit">Autorizar</button>
+            <div class="dica" style="margin-top:12px">Depois de autorizar, avise a pessoa: ela clica em <strong>Administrador</strong>, digita este e-mail e a senha que quiser. A senha é criada nesse primeiro acesso.</div>
+          </form>
+          <div class="cartao">
+            <h2>Administradores</h2>
+            <div class="tabela-wrap"><table>
+              <thead><tr><th>Nome</th><th>E-mail</th><th>Nível</th><th></th></tr></thead>
+              <tbody id="tabela-admins"></tbody>
+            </table></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- REGISTRO DE ATIVIDADES -->
+      <div id="painel-log" class="painel">
+        <div class="cartao">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+            <h2 style="margin:0">Registro de atividades</h2>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <select id="log-filtro" style="width:auto"><option value="">Todas as pessoas</option></select>
+              <button class="botao secundario pequeno" id="btn-atualizar-log" type="button">Atualizar</button>
+            </div>
+          </div>
+          <p class="dica">Tudo o que for criado, editado ou apagado fica registrado aqui automaticamente, com quem fez e quando. Ninguém consegue apagar este registro pelo site.</p>
+          <div class="tabela-wrap"><table>
+            <thead><tr><th>Quando</th><th>Quem</th><th>O que fez</th><th>Item</th></tr></thead>
+            <tbody id="tabela-log"></tbody>
+          </table></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="mensagem" class="mensagem"></div>
+  <input id="troca-foto" type="file" accept="image/*" hidden>
+
+  <script src="vendor/supabase.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

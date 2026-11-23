@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Álbum – Pulga</title>
+  <link rel="icon" href="assets/logo-pulga.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;700;800&family=Oswald:wght@500;600;700&display=swap">
+  <link rel="stylesheet" href="css/estilo.css">
+</head>
+<body>
+  <header id="topo"></header>
+  <main class="container">
+    <p style="margin:18px 0 0"><a href="albuns.html">← Todos os álbuns</a></p>
+    <div id="album" class="faixa"><p class="vazio">Carregando…</p></div>
+
+    <section>
+      <div class="titulo-secao"><h2>Fotos e vídeos</h2></div>
+      <div id="galeria" class="galeria"></div>
+    </section>
+  </main>
+  <footer id="rodape"></footer>
+
+  <dialog id="visualizador" class="visualizador">
+    <button class="botao secundario pequeno fechar" onclick="document.getElementById('visualizador').close()">✕ Fechar</button>
+    <div class="dialog-corpo" id="visualizador-corpo"></div>
+  </dialog>
+
+  <script src="vendor/supabase.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/album.js"></script>
+</body>
+</html>

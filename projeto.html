@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Projeto – Pulga</title>
+  <link rel="icon" href="assets/logo-pulga.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;700;800&family=Oswald:wght@500;600;700&display=swap">
+  <link rel="stylesheet" href="css/estilo.css">
+</head>
+<body>
+  <header id="topo"></header>
+  <main class="container">
+    <p style="margin:18px 0 0"><a href="projetos.html">← Todos os projetos</a></p>
+    <div id="album" class="faixa"><p class="vazio">Carregando…</p></div>
+
+    <section id="secao-eventos" hidden>
+      <div class="titulo-secao"><h2>Agenda do projeto</h2></div>
+      <div id="eventos" class="grade"></div>
+    </section>
+
+    <section>
+      <div class="titulo-secao"><h2>Álbuns do projeto</h2></div>
+      <div id="albuns" class="grade-albuns"></div>
+    </section>
+  </main>
+  <footer id="rodape"></footer>
+
+
+  <script src="vendor/supabase.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/albuns.js"></script>
+  <script src="js/projeto.js"></script>
+</body>
+</html>
