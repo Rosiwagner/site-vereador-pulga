@@ -355,6 +355,33 @@ create trigger log_albuns after insert or update or delete on public.albuns
   for each row execute function public.registrar_atividade();
 
 -- =====================================================================
+-- 9c) CARROSSEL DA PÁGINA INICIAL (fotos que ficam passando)
+-- =====================================================================
+create table if not exists public.carrossel (
+  id uuid primary key default gen_random_uuid(),
+  url text not null,
+  caminho text,                 -- caminho no Storage (para apagar o arquivo)
+  legenda text,
+  ordem int not null default 0,
+  criado_em timestamptz not null default now()
+);
+alter table public.carrossel enable row level security;
+drop policy if exists "publico ve carrossel" on public.carrossel;
+create policy "publico ve carrossel" on public.carrossel for select using (true);
+drop policy if exists "admins gerenciam carrossel" on public.carrossel;
+create policy "admins gerenciam carrossel" on public.carrossel
+  for all using (public.is_admin()) with check (public.is_admin());
+
+-- A primeira foto do carrossel é o cartaz oficial (só entra se o carrossel estiver vazio)
+insert into public.carrossel (url, legenda, ordem)
+select 'assets/cartaz-pulga.jpg', null, 0
+where not exists (select 1 from public.carrossel);
+
+drop trigger if exists log_carrossel on public.carrossel;
+create trigger log_carrossel after insert or update or delete on public.carrossel
+  for each row execute function public.registrar_atividade();
+
+-- =====================================================================
 -- 10) ADMINISTRADOR GERAL do site.
 --     A SENHA NÃO FICA AQUI: ela é criada no site, em "Primeiro acesso".
 -- =====================================================================

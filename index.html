@@ -17,10 +17,15 @@
 <body>
   <header id="topo"></header>
 
-  <main class="container">
-    <div class="capa">
-      <img src="assets/cartaz-pulga.jpg" alt="Pulga – Sempre ao lado da comunidade. Juntos por uma cidade ainda melhor!">
+  <!-- Carrossel de fotos (largura toda). As fotos são cadastradas no Administrador. -->
+  <div id="carrossel" class="carrossel" aria-roledescription="carrossel" aria-label="Fotos em destaque">
+    <div class="carrossel-trilho">
+      <div class="slide ativo"><div class="slide-fundo" style="background-image:url(assets/cartaz-pulga.jpg)"></div>
+        <img src="assets/cartaz-pulga.jpg" alt="Pulga – Sempre ao lado da comunidade. Juntos por uma cidade ainda melhor!"></div>
     </div>
+  </div>
+
+  <main class="container">
 
     <div id="aviso-demo" class="aviso-teste" hidden>
       <strong>⚠️ VERSÃO DE TESTE: ainda não está ligada ao banco de dados</strong>
@@ -81,6 +86,7 @@
   <script src="js/layout.js"></script>
   <script src="js/db.js"></script>
   <script src="js/albuns.js"></script>
+  <script src="js/carrossel.js"></script>
   <script src="js/publico.js"></script>
 </body>
 </html>

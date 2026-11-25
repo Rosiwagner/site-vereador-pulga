@@ -88,6 +88,7 @@ Para mudar algo depois, abra o arquivo no GitHub, clique no lápis (✏️), edi
 | Aba | Para quê |
 |---|---|
 | 📅 **Agenda** | Criar, editar e excluir eventos. Eles aparecem no calendário e em "Próximas ações". |
+| 🖼️ **Carrossel** | Até 50 fotos que passam sozinhas no topo da página inicial. Dá para trocar, excluir, mudar a ordem (← →) e pôr legenda. |
 | 📌 **Projetos** | Criar, editar e excluir projetos (nome, data, texto e capa). |
 | 📷 **Álbuns e fotos** | Criar álbuns (ligados a um projeto ou avulsos) e enviar, trocar a capa ou excluir fotos e vídeos. |
 | 👥 **Equipe** | Pessoas da equipe com foto, que aparecem no menu Equipe. |
@@ -103,6 +104,17 @@ Para mudar algo depois, abra o arquivo no GitHub, clique no lápis (✏️), edi
 O projeto e o álbum **Novos Bambas 2026 (Associação Xangô Capoeira)** já vêm criados, com o cartaz como capa.
 
 O plano gratuito do Supabase guarda até 1 GB de arquivos. As fotos são reduzidas automaticamente, então isso dá para alguns milhares delas.
+
+## Como publicar uma atualização do site no GitHub
+
+Sempre que eu te mandar um zip novo:
+
+1. Descompacte o zip no seu computador.
+2. Se a mensagem disser que tem SQL novo, rode o `supabase/schema.sql` no **SQL Editor** do Supabase (pode rodar quantas vezes quiser, não apaga nada).
+3. Abra o seu repositório no GitHub (`site-vereador-pulga`) e clique em **Add file** > **Upload files**.
+4. Abra a pasta descompactada, selecione **tudo o que está dentro dela** (Ctrl+A) e arraste para a página do GitHub. Os arquivos com o mesmo nome são substituídos.
+5. Lá embaixo, clique em **Commit changes**.
+6. Espere 1 ou 2 minutos e abra o site. Se ainda aparecer a versão antiga, aperte **Ctrl+F5**.
 
 ## Administrador geral e administradores
 

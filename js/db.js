@@ -89,6 +89,15 @@
         ok(await sb.from("midias").delete().eq("id", m.id));
       },
       async removerArquivo(caminho) { if (caminho) await sb.storage.from("midias").remove([caminho]); },
+      // ---- Carrossel ----
+      async listarCarrossel() {
+        return ok(await sb.from("carrossel").select("*").order("ordem").order("criado_em"));
+      },
+      async salvarSlide(s) { return this.salvar("carrossel", s); },
+      async excluirSlide(s) {
+        if (s.caminho) await sb.storage.from("midias").remove([s.caminho]);
+        ok(await sb.from("carrossel").delete().eq("id", s.id));
+      },
       // Envia um arquivo para o Storage e devolve { url, caminho }
       async enviarArquivo(arquivo, pasta) {
         const ext = (arquivo.name || "arquivo").split(".").pop().toLowerCase();
@@ -167,7 +176,7 @@
   // MODO DEMONSTRAÇÃO (dados no navegador)
   // ---------------------------------------------------------------
   function criarDemo() {
-    const CHAVE = "agenda-pulga-demo-v6";
+    const CHAVE = "agenda-pulga-demo-v7";
     const novoId = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
 
     function exemplo() {
@@ -210,6 +219,8 @@
         albuns: [{ ...capoeira, projeto_id: capoeira.id }],
         midias: [{ id: novoId(), album_id: capoeira.id, tipo: "foto", url: "assets/capoeira-novos-bambas.jpg", legenda: "Cartaz do evento" }],
         admins: [{ email: "wcfarias.wf@gmail.com", nome: "Wagner", nivel: "geral" }],
+        carrossel: [{ id: novoId(), url: "assets/cartaz-pulga.jpg", legenda: null, ordem: 0 },
+                    { id: novoId(), url: "assets/arte-oficial.jpg", legenda: null, ordem: 1 }],
         log: [],
         logado: false,
       };
@@ -319,6 +330,17 @@
       },
       async excluirMidia(m) { db().midias = db().midias.filter((x) => x.id !== m.id); salvarTudo(); },
       async removerArquivo() {},
+      async listarCarrossel() {
+        return [...(db().carrossel || [])].sort((a, b) => (a.ordem || 0) - (b.ordem || 0));
+      },
+      async salvarSlide(s) {
+        if (!db().carrossel) db().carrossel = [];
+        const r = await this.salvar("carrossel", s);
+        try { localStorage.setItem(CHAVE, JSON.stringify(db())); }
+        catch (e) { db().carrossel = db().carrossel.filter((x) => x.id !== r.id); throw new Error("Sem espaço no navegador (modo de teste). Use menos fotos."); }
+        return r;
+      },
+      async excluirSlide(s) { db().carrossel = db().carrossel.filter((x) => x.id !== s.id); salvarTudo(); },
       async enviarArquivo(arquivo) {
         if (!arquivo.type.startsWith("image/")) {
           throw new Error("No modo demonstração só é possível enviar fotos. Para vídeos, cole um link do YouTube.");
@@ -390,6 +412,7 @@
     embrulhar("salvar", async (o, t, item) => { const s = await o(t, item); registrar(item.id ? "editou" : "criou", t, s); return s; });
     embrulhar("excluir", async (o, t, id) => { const it = achar(t, id); await o(t, id); registrar("apagou", t, it); });
     embrulhar("excluirProjeto", async (o, id) => { const it = achar("projetos", id); await o(id); registrar("apagou", "projetos", it); });
+    embrulhar("excluirSlide", async (o, sl) => { await o(sl); registrar("apagou", "carrossel", { ...sl, legenda: sl.legenda || "foto do carrossel" }); });
     embrulhar("excluirAlbum", async (o, id) => { const it = achar("albuns", id); await o(id); registrar("apagou", "albuns", it); });
     embrulhar("adicionarMidia", async (o, m) => { const s = await o(m); registrar("criou", "midias", { ...s, legenda: s.legenda || (s.tipo === "video" ? "vídeo" : "foto") }); return s; });
     embrulhar("excluirMidia", async (o, m) => { await o(m); registrar("apagou", "midias", { ...m, legenda: m.legenda || m.tipo }); });

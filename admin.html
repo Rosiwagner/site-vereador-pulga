@@ -39,6 +39,7 @@
     <div id="tela-painel" hidden>
       <nav class="abas">
         <button class="aba ativa" data-aba="eventos">📅 Agenda</button>
+        <button class="aba" data-aba="carrossel">🖼️ Carrossel</button>
         <button class="aba" data-aba="projetos">📌 Projetos</button>
         <button class="aba" data-aba="albuns">📷 Álbuns e fotos</button>
         <button class="aba" data-aba="colaboradores">👥 Equipe</button>
@@ -89,6 +90,24 @@
               </table>
             </div>
           </div>
+        </div>
+      </div>
+
+      <!-- CARROSSEL -->
+      <div id="painel-carrossel" class="painel">
+        <div class="cartao">
+          <h2>Fotos do carrossel da página inicial</h2>
+          <p class="dica" style="margin-top:0">As fotos passam sozinhas a cada 5 segundos, na ordem abaixo. Você pode colocar até <strong>50 fotos</strong>.
+            Fotos deitadas (mais largas que altas) ficam melhores.</p>
+          <div class="linha" style="align-items:end">
+            <div class="campo">
+              <label for="car-arquivos">Adicionar fotos (pode escolher várias de uma vez)</label>
+              <input id="car-arquivos" type="file" accept="image/*" multiple>
+            </div>
+            <div class="campo"><strong id="car-contador"></strong></div>
+          </div>
+          <p id="erro-carrossel" class="erro"></p>
+          <div id="lista-carrossel" class="lista-carrossel"></div>
         </div>
       </div>
 
@@ -298,6 +317,7 @@
 
   <div id="mensagem" class="mensagem"></div>
   <input id="troca-foto" type="file" accept="image/*" hidden>
+  <input id="troca-slide" type="file" accept="image/*" hidden>
 
   <script src="vendor/supabase.js"></script>
   <script src="js/config.js"></script>

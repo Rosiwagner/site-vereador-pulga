@@ -81,6 +81,7 @@
     desenharPessoas("colaboradores", colaboradores, (p) => p.funcao);
     desenharPessoas("participantes", participantes, (p) => p.bairro);
     desenharMarcacoes([], []);
+    await desenharCarrossel();
     await desenharProjetos();
     await desenharAlbuns();
     await desenharEventos();
@@ -173,6 +174,101 @@
     } catch (err) {
       $("erro-evento").textContent = "Erro ao salvar: " + err.message;
     }
+  });
+
+  // ------------------- CARROSSEL -------------------
+  const MAX_SLIDES = 50;
+  let slides = [];
+  let slideTrocando = null;
+
+  async function desenharCarrossel() {
+    slides = await DB.listarCarrossel();
+    $("car-contador").textContent = `${slides.length} de ${MAX_SLIDES} fotos`;
+    $("car-arquivos").disabled = slides.length >= MAX_SLIDES;
+    $("lista-carrossel").innerHTML = slides.length ? slides.map((s, i) => `
+      <figure>
+        <img src="${esc(s.url)}" alt="">
+        <figcaption>
+          <span class="numero">Foto ${i + 1}</span>
+          <input data-legenda="${i}" value="${esc(s.legenda || "")}" placeholder="Legenda (opcional)">
+          <div class="acoes">
+            <button class="botao secundario pequeno" data-mover="${i}" data-dir="-1" title="Mover para antes" ${i === 0 ? "disabled" : ""}>←</button>
+            <button class="botao secundario pequeno" data-mover="${i}" data-dir="1" title="Mover para depois" ${i === slides.length - 1 ? "disabled" : ""}>→</button>
+            <button class="botao azul pequeno" data-trocar="${i}">Trocar</button>
+            <button class="botao perigo pequeno" data-excluir-slide="${i}" title="Excluir">✕</button>
+          </div>
+        </figcaption>
+      </figure>`).join("") : `<p class="vazio">Nenhuma foto ainda. Enquanto estiver vazio, aparece o cartaz oficial.</p>`;
+
+    const L = $("lista-carrossel");
+    L.querySelectorAll("[data-legenda]").forEach((inp) => inp.addEventListener("change", async () => {
+      await DB.salvarSlide({ id: slides[inp.dataset.legenda].id, legenda: inp.value.trim() || null });
+      aviso("Legenda salva");
+    }));
+    L.querySelectorAll("[data-mover]").forEach((b) => b.addEventListener("click", async () => {
+      const i = Number(b.dataset.mover), j = i + Number(b.dataset.dir);
+      [slides[i], slides[j]] = [slides[j], slides[i]];
+      // Regrava a ordem (0, 1, 2...) só das fotos que mudaram de posição
+      for (const [k, sl] of slides.entries()) {
+        if (sl.ordem !== k) await DB.salvarSlide({ id: sl.id, ordem: k });
+      }
+      await desenharCarrossel();
+    }));
+    L.querySelectorAll("[data-trocar]").forEach((b) => b.addEventListener("click", () => {
+      slideTrocando = slides[b.dataset.trocar];
+      $("troca-slide").value = ""; $("troca-slide").click();
+    }));
+    L.querySelectorAll("[data-excluir-slide]").forEach((b) => b.addEventListener("click", async () => {
+      if (!confirm("Tirar esta foto do carrossel?")) return;
+      await DB.excluirSlide(slides[b.dataset.excluirSlide]);
+      aviso("Foto excluída");
+      await desenharCarrossel();
+    }));
+  }
+
+  // Normaliza a ordem (0, 1, 2...) antes de acrescentar fotos novas no fim
+  async function proximaOrdem() {
+    return slides.length ? Math.max(...slides.map((s) => s.ordem || 0)) + 1 : 0;
+  }
+
+  $("car-arquivos").addEventListener("change", async (e) => {
+    const arquivos = [...e.target.files];
+    $("erro-carrossel").textContent = "";
+    const vagas = MAX_SLIDES - slides.length;
+    if (arquivos.length > vagas) {
+      $("erro-carrossel").textContent = `Cabem só mais ${vagas} fotos. As primeiras ${vagas} serão enviadas.`;
+      arquivos.length = Math.max(vagas, 0);
+    }
+    let ordem = await proximaOrdem(), enviados = 0;
+    for (const original of arquivos) {
+      try {
+        aviso(`Enviando ${enviados + 1} de ${arquivos.length}…`);
+        const arq = await UTIL.reduzirFoto(original, 1920);
+        const { url, caminho } = await DB.enviarArquivo(arq, "carrossel");
+        await DB.salvarSlide({ url, caminho, ordem: ordem++, legenda: null });
+        enviados++;
+      } catch (err) {
+        $("erro-carrossel").textContent = "Erro: " + err.message;
+        break;
+      }
+    }
+    if (enviados) aviso(`${enviados} ${enviados === 1 ? "foto adicionada" : "fotos adicionadas"} ✅`);
+    e.target.value = "";
+    await desenharCarrossel();
+  });
+
+  $("troca-slide").addEventListener("change", async (e) => {
+    const arquivo = e.target.files[0];
+    if (!arquivo || !slideTrocando) return;
+    try {
+      aviso("Enviando foto…");
+      const { url, caminho } = await DB.enviarArquivo(await UTIL.reduzirFoto(arquivo, 1920), "carrossel");
+      await DB.salvarSlide({ id: slideTrocando.id, url, caminho });
+      if (slideTrocando.caminho) DB.removerArquivo(slideTrocando.caminho).catch(() => {});
+      aviso("Foto trocada ✅");
+      await desenharCarrossel();
+    } catch (err) { $("erro-carrossel").textContent = "Erro: " + err.message; }
+    slideTrocando = null;
   });
 
   // ------------------- PROJETOS -------------------
@@ -557,7 +653,7 @@
 
   // ------------------- REGISTRO DE ATIVIDADES -------------------
   const NOMES_TABELA = {
-    eventos: "evento", projetos: "projeto", albuns: "álbum", midias: "foto/vídeo", colaboradores: "membro da equipe",
+    eventos: "evento", carrossel: "foto do carrossel", projetos: "projeto", albuns: "álbum", midias: "foto/vídeo", colaboradores: "membro da equipe",
     participantes: "participante", admins: "administrador",
   };
   let log = [];
